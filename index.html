@@ -58,13 +58,24 @@ socket.on('MoreData', function (data){
     UpdateBar(data['Percent']);
     var Place = data['Place'] * 524288; //The Next Blocks Starting Position
     var NewFile; //The Variable that will hold the new Block of Data
-    if(SelectedFile.webkitSlice) 
+    if (SelectedFile.slice){
+       NewFile = SelectedFile.slice(Place, Place + Math.min(524288, (SelectedFile.size-Place)));
+    }
+    else if(SelectedFile.webkitSlice) 
         NewFile = SelectedFile.webkitSlice(Place, Place + Math.min(524288, (SelectedFile.size-Place)));
     else
         NewFile = SelectedFile.mozSlice(Place, Place + Math.min(524288, (SelectedFile.size-Place)));
     FReader.readAsBinaryString(NewFile);
 });
- 
+socket.on('Done', function (data){
+    var Content = "File Successfully Upladed !!";    
+    Content += "<button  type='button' name='Upload' value='' id='Restart' class='Button'>Upload Another</button>";
+    document.getElementById('UploadArea').innerHTML = Content;
+    document.getElementById('Restart').addEventListener('click', Refresh);
+});
+function Refresh(){
+    location.reload(true);
+} 
 function UpdateBar(percent){
     document.getElementById('ProgressBar').style.width = percent + '%';
     document.getElementById('percent').innerHTML = (Math.round(percent*100)/100) + '%';
