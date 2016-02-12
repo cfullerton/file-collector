@@ -9,68 +9,94 @@ var app = require('express')();
 var server = require('http').createServer(app);
 var io = require('socket.io')(server);
 var Files = {};
-io.on('connection', function() { 
-    console.log("a user connected"); 
+var archiver = require('archiver');
+io.on('connection', function() {
+    console.log("a user connected");
 });
-app.get('/', function(req, res){
-  res.sendfile('index.html');
+app.get('/', function(req, res) {
+    res.sendfile('index.html');
 });
-io.sockets.on('connection', function (socket) {
-    socket.on('Start', function (data) { //data contains the variables that we passed through in the html file
+app.get('/getFile', function(req, res) {
+    res.sendfile('bulk-output.zip');
+});
+io.sockets.on('connection', function(socket) {
+    socket.on('Start', function(data) { //data contains the variables that we passed through in the html file
         var Name = data['Name'];
-        Files[Name] = {  //Create a new Entry in The Files Variable
-            FileSize : data['Size'],
-            Data     : "",
-            Downloaded : 0
+        Files[Name] = { //Create a new Entry in The Files Variable
+            FileSize: data['Size'],
+            Data: "",
+            Downloaded: 0
         }
         var Place = 0;
-        try{
-            var Stat = fs.statSync('Temp/' +  Name);
-            if(Stat.isFile())
-            {
+        try {
+            var Stat = fs.statSync('Temp/' + Name);
+            if (Stat.isFile()) {
                 Files[Name]['Downloaded'] = Stat.size;
                 Place = Stat.size / 524288;
             }
-        }
-        catch(er){} //It's a New File
-        fs.open("Temp/" + Name, "a", 0755, function(err, fd){
-            if(err)
-            {
+        } catch (er) {} //It's a New File
+        fs.open("Temp/" + Name, "a", 0755, function(err, fd) {
+            if (err) {
                 console.log(err);
-            }
-            else
-            {
+            } else {
                 Files[Name]['Handler'] = fd; //We store the file handler so we can write to it later
-                socket.emit('MoreData', { 'Place' : Place, Percent : 0 });
+                socket.emit('MoreData', {
+                    'Place': Place,
+                    Percent: 0
+                });
             }
         });
-});
-socket.on('Upload', function (data){
+    });
+    socket.on('Upload', function(data) {
         var Name = data['Name'];
         Files[Name]['Downloaded'] += data['Data'].length;
         Files[Name]['Data'] += data['Data'];
-        if(Files[Name]['Downloaded'] == Files[Name]['FileSize']) //If File is Fully Uploaded
-        {   
-		    fs.write(Files[Name]['Handler'], Files[Name]['Data'], null, 'Binary', function(err, Writen){
+        if (Files[Name]['Downloaded'] == Files[Name]['FileSize']) //If File is Fully Uploaded
+        {
+            fs.write(Files[Name]['Handler'], Files[Name]['Data'], null, 'Binary', function(err, Writen) {
                 socket.emit('Done', {});
-				inputFile = "Temp/" + Name;
-				downloadFiles();
+                inputFile = "Temp/" + Name;
+                downloadFiles();
+                var output = fs.createWriteStream(__dirname + '/bulk-output.zip');
+                var archive = archiver('zip');
+
+                output.on('close', function() {
+                    console.log(archive.pointer() + ' total bytes');
+                    console.log('archiver has been finalized and the output file descriptor has closed.');
+                });
+
+                archive.on('error', function(err) {
+                    throw err;
+                });
+               
+                archive.pipe(output);
+				// broken, needs a promise 
+				archive.bulk([{
+                     expand: true,
+                     cwd: 'export-files/',
+                     src: ['*']
+                }]);	
+			    archive.finalize();
+				socket.emit('fileDone');	   
             });
-            socket.emit('done',{});
-        }
-        else if(Files[Name]['Data'].length > 10485760){ //If the Data Buffer reaches 10MB
-            fs.write(Files[Name]['Handler'], Files[Name]['Data'], null, 'Binary', function(err, Writen){
+            socket.emit('done', {});
+        } else if (Files[Name]['Data'].length > 10485760) { //If the Data Buffer reaches 10MB
+            fs.write(Files[Name]['Handler'], Files[Name]['Data'], null, 'Binary', function(err, Writen) {
                 Files[Name]['Data'] = ""; //Reset The Buffer
                 var Place = Files[Name]['Downloaded'] / 524288;
                 var Percent = (Files[Name]['Downloaded'] / Files[Name]['FileSize']) * 100;
-                socket.emit('MoreData', { 'Place' : Place, 'Percent' :  Percent});
+                socket.emit('MoreData', {
+                    'Place': Place,
+                    'Percent': Percent
+                });
             });
-        }
-        else
-        {
+        } else {
             var Place = Files[Name]['Downloaded'] / 524288;
             var Percent = (Files[Name]['Downloaded'] / Files[Name]['FileSize']) * 100;
-            socket.emit('MoreData', { 'Place' : Place, 'Percent' :  Percent});
+            socket.emit('MoreData', {
+                'Place': Place,
+                'Percent': Percent
+            });
         }
     });
 });

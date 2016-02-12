@@ -14,6 +14,7 @@
             <button  type='button' id='UploadButton' class='Button'>Upload</button>
         </span>
     </div>
+	<div id="file-link"></div>
 <script>
 window.addEventListener("load", Ready); 
  
@@ -72,6 +73,9 @@ socket.on('Done', function (data){
     Content += "<button  type='button' name='Upload' value='' id='Restart' class='Button'>Upload Another</button>";
     document.getElementById('UploadArea').innerHTML = Content;
     document.getElementById('Restart').addEventListener('click', Refresh);
+});
+socket.on('fileDone',function(){
+    document.getElementById('file-link').innerHTML = '<a href="/getFile" target="black">Download Zip</a>';
 });
 function Refresh(){
     location.reload(true);
