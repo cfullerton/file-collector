@@ -56,28 +56,19 @@ io.sockets.on('connection', function(socket) {
             fs.write(Files[Name]['Handler'], Files[Name]['Data'], null, 'Binary', function(err, Writen) {
                 socket.emit('Done', {});
                 inputFile = "Temp/" + Name;
-                downloadFiles();
-                var output = fs.createWriteStream(__dirname + '/bulk-output.zip');
-                var archive = archiver('zip');
-
-                output.on('close', function() {
-                    console.log(archive.pointer() + ' total bytes');
-                    console.log('archiver has been finalized and the output file descriptor has closed.');
+                var lineCount = 0; 
+                lr = new LineByLineReader(inputFile);
+                lr.on('error', function(err) {
+                    // 'err' contains error object
+                    console.log(err);
                 });
-
-                archive.on('error', function(err) {
-                    throw err;
+                lr.on('line', function(line) {
+                     lineCount++;
                 });
-               
-                archive.pipe(output);
-				// broken, needs a promise 
-				archive.bulk([{
-                     expand: true,
-                     cwd: 'export-files/',
-                     src: ['*']
-                }]);	
-			    archive.finalize();
-				socket.emit('fileDone');	   
+                lr.on('end', function() {
+                    socket.emit("startGet", lineCount);
+                    downloadFiles();
+                });                	   
             });
             socket.emit('done', {});
         } else if (Files[Name]['Data'].length > 10485760) { //If the Data Buffer reaches 10MB
@@ -99,8 +90,30 @@ io.sockets.on('connection', function(socket) {
             });
         }
     });
-});
 
+function zipIt(){
+    var output = fs.createWriteStream(__dirname + '/bulk-output.zip');
+                var archive = archiver('zip');
+
+                output.on('close', function() {
+                    console.log(archive.pointer() + ' total bytes');
+                    console.log('archiver has been finalized and the output file descriptor has closed.');
+                });
+
+                archive.on('error', function(err) {
+                    throw err;
+                });
+               
+                archive.pipe(output);
+				// broken, needs a promise 
+				archive.bulk([{
+                     expand: true,
+                     cwd: 'export-files/',
+                     src: ['*']
+                }]);	
+			    archive.finalize();
+				socket.emit('fileDone');
+}
 var download = function(uri, filename, callback) {
 
     console.log(uri);
@@ -109,6 +122,7 @@ var download = function(uri, filename, callback) {
 };
 
 function downloadFiles() {
+	var upLineCount = 0;
     lr = new LineByLineReader(inputFile);
     lr.on('error', function(err) {
         // 'err' contains error object
@@ -123,6 +137,8 @@ function downloadFiles() {
             console.log(fileName);
             download(line, fileName, function() {
                 lr.resume();
+				upLineCount++;
+				socket.emit("fileGot", {number:upLineCount,name:fileName});
                 console.log('done');
             });
         } else {
@@ -133,7 +149,9 @@ function downloadFiles() {
     });
 
     lr.on('end', function() {
-        console.log("all done!")
+        zipIt();
+        console.log("all done!");
     });
 }
+});
 server.listen(3000);

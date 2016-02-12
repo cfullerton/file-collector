@@ -14,6 +14,7 @@
             <button  type='button' id='UploadButton' class='Button'>Upload</button>
         </span>
     </div>
+    <div id="downloadarea"></div>
 	<div id="file-link"></div>
 <script>
 window.addEventListener("load", Ready); 
@@ -42,7 +43,7 @@ function StartUpload(){
         FReader = new FileReader();
         Name = document.getElementById('NameBox').value;
         var Content = "<span id='NameArea'>Uploading " + SelectedFile.name + " as " + Name + "</span>";
-        Content += '<div id="ProgressContainer"><div id="ProgressBar"></div></div><span id="percent">0%</span>';
+        Content += '<div id="ProgressContainer"><progress id ="uploadProgress"></progress></div><span id="percent">0%</span>';
         Content += "<span id='Uploaded'> - <span id='MB'>0</span>/" + Math.round(SelectedFile.size / 1048576) + "MB</span>";
         document.getElementById('UploadArea').innerHTML = Content;
         FReader.onload = function(evnt){
@@ -69,19 +70,34 @@ socket.on('MoreData', function (data){
     FReader.readAsBinaryString(NewFile);
 });
 socket.on('Done', function (data){
-    var Content = "File Successfully Upladed !!";    
-    Content += "<button  type='button' name='Upload' value='' id='Restart' class='Button'>Upload Another</button>";
+    var Content = "List Successfully Uploaded. Downloading files from URLs";   
     document.getElementById('UploadArea').innerHTML = Content;
-    document.getElementById('Restart').addEventListener('click', Refresh);
 });
 socket.on('fileDone',function(){
     document.getElementById('file-link').innerHTML = '<a href="/getFile" target="black">Download Zip</a>';
+});
+var totalFiles=0;
+socket.on('startGet',function(passFiles){
+	    totalFiles = passFiles;
+        var Content = "<span id='NameArea'></span>";
+        Content += '<div class="ProgressContainer"><progress id ="downloadProgress"></progress></div><span id="getpercent">0%</span>';
+        Content += "<span id='downloaded'> - <span id='files'>0</span>%" + " Files</span>";
+		 document.getElementById('downloadarea').innerHTML = Content;
+		 downloadProgress.value=0;
+});
+socket.on('fileGot',function(data){
+	var currentLine = data.number;
+	var fileName = data.name;
+    document.getElementById('files').innerHTML = currentLine;
+	 document.getElementById('downloadProgress').value = currentLine / totalFiles;
+	 document.getElementById('getpercent').innerHTML = Math.round(currentLine / totalFiles *100);
+	  document.getElementById('NameArea').innerHTML = fileName;
 });
 function Refresh(){
     location.reload(true);
 } 
 function UpdateBar(percent){
-    document.getElementById('ProgressBar').style.width = percent + '%';
+    document.getElementById('uploadProgress').value = percent;
     document.getElementById('percent').innerHTML = (Math.round(percent*100)/100) + '%';
     var MBDone = Math.round(((percent/100.0) * SelectedFile.size) / 1048576);
     document.getElementById('MB').innerHTML = MBDone;
