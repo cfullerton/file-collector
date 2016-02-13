@@ -115,7 +115,7 @@ function zipIt(){
 				// broken, needs a promise 
 				archive.bulk([{
                      expand: true,
-                     cwd: 'export-files/',
+                     cwd: exportDir + "/",
                      src: ['*']
                 }]);	
 			    archive.finalize();
@@ -124,11 +124,16 @@ function zipIt(){
 var download = function(uri, filename, callback) {
 
     console.log(uri);
-    request(uri).pipe(fs.createWriteStream("export-files/" + filename)).on('close', callback);
+    request(uri).pipe(fs.createWriteStream(exportDir +"/" + filename)).on('close', callback);
 
 };
 
 function downloadFiles() {
+	 exportDir = 'export-files/' + Date.now();
+
+     if (!fs.existsSync(exportDir)){
+         fs.mkdirSync(exportDir);
+     }
 	var upLineCount = 0;
     lr = new LineByLineReader(inputFile);
     lr.on('error', function(err) {
