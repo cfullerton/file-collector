@@ -17,7 +17,12 @@ app.get('/', function(req, res) {
     res.sendfile('index.html');
 });
 app.get('/getFile', function(req, res) {
-    res.sendfile('bulk-output.zip');
+    res.sendfile(zipName);
+});
+app.get('/public/*', function(req, res){
+    var uid = req.params.uid,
+        path = req.params[0] ? req.params[0] : 'index.html';
+    res.sendfile(path, {root: './public'});
 });
 io.sockets.on('connection', function(socket) {
     socket.on('Start', function(data) { //data contains the variables that we passed through in the html file
@@ -92,12 +97,14 @@ io.sockets.on('connection', function(socket) {
     });
 
 function zipIt(){
-    var output = fs.createWriteStream(__dirname + '/bulk-output.zip');
+	  zipName = __dirname +  '/zips/' + Date.now() + '.zip';
+     var output = fs.createWriteStream(zipName);
                 var archive = archiver('zip');
 
                 output.on('close', function() {
                     console.log(archive.pointer() + ' total bytes');
                     console.log('archiver has been finalized and the output file descriptor has closed.');
+					socket.emit('fileDone');
                 });
 
                 archive.on('error', function(err) {
@@ -112,7 +119,7 @@ function zipIt(){
                      src: ['*']
                 }]);	
 			    archive.finalize();
-				socket.emit('fileDone');
+				
 }
 var download = function(uri, filename, callback) {
 
