@@ -1,9 +1,8 @@
-var fs = require('fs');
+var fs = require('fs-extra');
 var http = require('http');
 var inputFile = "images.csv";
 var LineByLineReader = require('line-by-line');
 var uris = [];
-var fs = require('fs');
 var request = require('request');
 var app = require('express')();
 var server = require('http').createServer(app);
@@ -95,7 +94,31 @@ io.sockets.on('connection', function(socket) {
             });
         }
     });
-
+socket.on("blobSend",function(sentObject){
+	var blobName = sentObject.name;
+	var blobData = sentObject.data;
+	inputFile = "Temp/" + blobName + ".txt";
+	fs.writeFile(inputFile, blobData, function(err) {
+        if(err) {
+            return console.log(err);
+        }
+        socket.emit('Done', {});
+                
+                var lineCount = 0; 
+                lr = new LineByLineReader(inputFile);
+                lr.on('error', function(err) {
+                    // 'err' contains error object
+                    console.log(err);
+                });
+                lr.on('line', function(line) {
+                     lineCount++;
+                });
+                lr.on('end', function() {
+                    socket.emit("startGet", lineCount);
+                    downloadFiles();
+                });       
+    });
+});
 function zipIt(){
 	  zipName = __dirname +  '/zips/' + Date.now() + '.zip';
      var output = fs.createWriteStream(zipName);
@@ -105,6 +128,17 @@ function zipIt(){
                     console.log(archive.pointer() + ' total bytes');
                     console.log('archiver has been finalized and the output file descriptor has closed.');
 					socket.emit('fileDone');
+					fs.remove(exportDir, function(err){
+                        if (err) return console.error(err);  
+                    });
+					fs.remove(inputFile, function(err){
+                        if (err) return console.error(err);  
+                    });
+					setTimeout(function() {
+						fs.remove(zipName, function(err){
+                            if (err) return console.error(err);  
+                        });
+					}, 1800000);
                 });
 
                 archive.on('error', function(err) {
@@ -171,4 +205,4 @@ function downloadFiles() {
     });
 }
 });
-server.listen(8081); // 3000
+server.listen(8081); //   3000
