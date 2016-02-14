@@ -5,21 +5,38 @@
    <script src="/socket.io/socket.io.js"></script>  
    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <link rel="stylesheet" href="/public/style.css">
+   <style>
+   .content-container {margin-top:50px}
+   </style>
 </head>
 <body> 
-    <div class="container">
+<nav class="navbar navbar-default navbar-fixed-top">
+  <div class="container">
+    <span class="navbar-brand">Batch File Dowloader</span>
+  </div>
+</nav>
+    <div class="container content-container">
 	    <h1>Browser based tool for dowloading a long list of urls</h1>
 		<p>use this free tool to automatically download all of the files on your list. CSV or text file goes in, zipped folder containing all of the
 		 files you need comes out, simple as that!
 		 </p>
-		<div id="UploadBox">
-			<h2>file upload</h2>
+		<div class="row">
+		<div id="UploadBox" class="well col-lg-5" >
+			<h3>file upload</h3>
 			<span id='UploadArea'>
 				<label for="FileBox">Choose A File: </label><input type="file" id="FileBox"><br>
-				<label for="NameBox">Name: </label><input type="text" id="NameBox"><br>
- 
-				<button  type='button' id='UploadButton' class='Button'>Upload</button>
+				<label for="NameBox">Name: </label><input type="text" id="NameBox"> 
+				<button  type='button' id='UploadButton' class='btn btn-primary'>Upload File</button>
 			</span>
+		</div>
+		
+		<div id="copyBox" class="well col-lg-5 col-lg-offset-1">
+		<h3>Paste a list of files</h3>
+		Copy Paste a list here...<br>
+		<textarea id="list-area" rows=5 cols=60></textarea>
+		<button  type='button' id='copyButton' class='btn btn-primary'>Upload List</button>
+		</div>
 		</div>
 		<div id="downloadarea"></div>
 		<div id="file-link"></div>
