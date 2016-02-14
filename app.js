@@ -123,15 +123,7 @@ function zipIt(){
 var download = function(uri, filename, callback) {
 
     console.log(uri);
-	request(uri, function (error, response, body) {
-     if (!error && response.statusCode == 200) {
-            request(uri).pipe(fs.createWriteStream(exportDir +"/" + filename)).on('close', callback);  
-         }else {
-			    lr.resume();
-				upLineCount++;
-				socket.emit("fileGot", {number:upLineCount,name:"bad url, skipped"});
-		 }
-     })   
+            request(uri).pipe(fs.createWriteStream(exportDir +"/" + filename)).on('close', callback);   
 
 };
 
