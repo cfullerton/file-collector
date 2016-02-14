@@ -15,7 +15,7 @@ function FileChosen(evnt) {
     SelectedFile = evnt.target.files[0];
     document.getElementById('NameBox').value = SelectedFile.name;
 }
-var socket = io.connect('http://default-environment.9b98yidmia.us-west-2.elasticbeanstalk.com/');
+var socket = io.connect('http://localhost:3000'); // http://default-environment.9b98yidmia.us-west-2.elasticbeanstalk.com/
 var FReader;
 var Name;
 function StartUpload(){
@@ -61,8 +61,10 @@ var totalFiles=0;
 socket.on('startGet',function(passFiles){
 	    totalFiles = passFiles;
         var Content = "<span id='NameArea'></span>";
-        Content += '<div class="ProgressContainer"><progress id ="downloadProgress"></progress></div><span id="getpercent">0%</span>';
-        Content += "<span id='downloaded'> - <span id='files'>0</span>%" + " Files</span>";
+        Content += '<div class="ProgressContainer"><progress id ="downloadProgress"></progress></div><span id="getpercent">0</span>%';
+        Content += "<span id='downloaded'> - <span id='files'>0</span> " + " Lines Processed </span><span id='goodFiles'>0</span>" 
+        + " Files Downloaded <span id=badUrl>0</span> Bad Urls ";
+		Content += '<span id="emptyLines"></span> empty Lines';
 		 document.getElementById('downloadarea').innerHTML = Content;
 		 downloadProgress.value=0;
 });
@@ -70,10 +72,22 @@ socket.on('fileGot',function(data){
 	var currentLine = data.number;
 	var fileName = data.name;
     document.getElementById('files').innerHTML = currentLine;
+	document.getElementById('goodFiles').innerHTML = currentLine - badUrls;
 	 document.getElementById('downloadProgress').value = currentLine / totalFiles;
 	 document.getElementById('getpercent').innerHTML = Math.round(currentLine / totalFiles *100);
 	  document.getElementById('NameArea').innerHTML = fileName;
 });
+var badUrls = 0;
+socket.on("badUrl",function(){
+	badUrls++;
+	document.getElementById('badUrl').innerHTML = badUrls;
+});
+var emptyLines = 0;
+socket.on("emptyLine",function(){
+	totalFiles--;
+	emptyLines++
+	document.getElementById('emptyLines').innerHTML = emptyLines;
+})
 function Refresh(){
     location.reload(true);
 } 
