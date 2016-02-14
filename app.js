@@ -112,7 +112,6 @@ function zipIt(){
                 });
                
                 archive.pipe(output);
-				// broken, needs a promise 
 				archive.bulk([{
                      expand: true,
                      cwd: exportDir + "/",
@@ -128,8 +127,9 @@ var download = function(uri, filename, callback) {
      if (!error && response.statusCode == 200) {
             request(uri).pipe(fs.createWriteStream(exportDir +"/" + filename)).on('close', callback);  
          }else {
-			 callback;
-			 socket.emit("fileGot", {number:upLineCount,name:"fatal error on this line, check your file and try again"});
+			    lr.resume();
+				upLineCount++;
+				socket.emit("fileGot", {number:upLineCount,name:"bad url, skipped"});
 		 }
      })   
 
