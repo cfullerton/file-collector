@@ -2,7 +2,8 @@ window.addEventListener("load", Ready);
  
 function Ready(){ 
     if(window.File && window.FileReader){ //These are the relevant HTML5 objects that we are going to use 
-        document.getElementById('UploadButton').addEventListener('click', StartUpload);  
+        document.getElementById('UploadButton').addEventListener('click', StartUpload);
+        document.getElementById('copyButton').addEventListener('click', areaUpload);		
         document.getElementById('FileBox').addEventListener('change', FileChosen);
     }
     else
@@ -15,7 +16,7 @@ function FileChosen(evnt) {
     SelectedFile = evnt.target.files[0];
     document.getElementById('NameBox').value = SelectedFile.name;
 }
-var socket = io.connect('http://localhost:3000'); // http://default-environment.9b98yidmia.us-west-2.elasticbeanstalk.com/
+var socket = io.connect('http://default-environment.9b98yidmia.us-west-2.elasticbeanstalk.com/'); ////http://localhost:3000
 var FReader;
 var Name;
 function StartUpload(){
@@ -36,6 +37,19 @@ function StartUpload(){
     {
         alert("Please Select A File");
     }
+}
+function areaUpload(){
+	/* Name = Date.now() + "list";
+	var textToWrite = document.getElementById("list-area").value;
+	 var textFileAsBlob = new Blob([textToWrite], {type:'text/plain'});
+	var Content = "<span id='NameArea'>Uploading list as " + Name + "</span>";
+        Content += '<div id="ProgressContainer"><progress id ="uploadProgress"></progress></div><span id="percent">0%</span>';
+        Content += "<span id='Uploaded'> - <span id='MB'>0</span>/" + Math.round(textFileAsBlob.size / 1048576) + "MB</span>";
+        document.getElementById('UploadArea').innerHTML = Content;
+	
+	 socket.emit('Upload', { 'Name' : Name, Data : textFileAsBlob });
+	 socket.emit('Start', { 'Name' : Name, 'Size' : textFileAsBlob.size }); */
+	 console.log("feature not added yet");
 }
 socket.on('MoreData', function (data){
     UpdateBar(data['Percent']);
