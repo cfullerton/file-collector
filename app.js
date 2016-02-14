@@ -129,6 +129,7 @@ var download = function(uri, filename, callback) {
             request(uri).pipe(fs.createWriteStream(exportDir +"/" + filename)).on('close', callback);  
          }else {
 			 callback;
+			 socket.emit("fileGot", {number:upLineCount,name:"fatal error on this line, check your file and try again"});
 		 }
      })   
 
