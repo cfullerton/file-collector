@@ -124,7 +124,11 @@ function zipIt(){
 var download = function(uri, filename, callback) {
 
     console.log(uri);
-    request(uri).pipe(fs.createWriteStream(exportDir +"/" + filename)).on('close', callback);
+	request(uri, function (error, response, body) {
+     if (!error && response.statusCode == 200) {
+            request(uri).pipe(fs.createWriteStream(exportDir +"/" + filename)).on('close', callback);  
+         }
+     })   
 
 };
 
