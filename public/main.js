@@ -31,6 +31,7 @@ function StartUpload(){
         FReader.onload = function(evnt){
             socket.emit('Upload', { 'Name' : Name, Data : evnt.target.result });
         }
+        }
         socket.emit('Start', { 'Name' : Name, 'Size' : SelectedFile.size });
     }
     else
@@ -66,7 +67,7 @@ socket.on('Done', function (data){
     document.getElementById('UploadArea').innerHTML = Content;
 });
 socket.on('fileDone',function(){
-    document.getElementById('file-link').innerHTML = '<a href="/getFile" target="black">Download Zip</a>';
+    document.getElementById('file-link').innerHTML = '<a class="btn btn-success" href="/getFile" target="black">Download Zip</a>';
 });
 var totalFiles=0;
 socket.on('startGet',function(passFiles){

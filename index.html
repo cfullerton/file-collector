@@ -53,12 +53,14 @@
 		    <p class="about">You can paste your list below but if your list is very long or if you already have it in spreadsheet then uploading is easier
 			formatting is pretty simple, put one url on each line. No header is need but if you have one there's no harm. non url rows or empty rows are 
 			skipped and logged. If you're still unsure on how to format your list file check out the examples below:<br>
-			<a href="/txt-example">.txt example</a> <a href="/csv-example">.csv example</a>
+			<a class="btn btn-info" href="/public/txt-example.txt">.txt example</a> <a class="btn btn-info" href="/public/csv-example.csv">.csv example</a>
 		    </p>
 		</div>	
 		 </div>
 		<div class="row">
 		<h2>Get Started...</h2>
+		<div id="downloadarea"></div>
+		<div id="file-link"></div>
 		<div id="UploadBox" class="well col-lg-5" >
 			<h3>Upload a list of files</h3>
 			<span id='UploadArea'>
@@ -75,8 +77,7 @@
 		<button  type='button' id='copyButton' class='btn btn-primary'>Upload List</button>
 		</div>
 		</div>
-		<div id="downloadarea"></div>
-		<div id="file-link"></div>
+		
 	</div>
 <script src="/public/main.js"></script>
 </body>
