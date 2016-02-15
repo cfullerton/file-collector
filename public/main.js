@@ -31,8 +31,9 @@ function StartUpload(){
         FReader.onload = function(evnt){
             socket.emit('Upload', { 'Name' : Name, Data : evnt.target.result });
         }
+		socket.emit('Start', { 'Name' : Name, 'Size' : SelectedFile.size });
         }
-        socket.emit('Start', { 'Name' : Name, 'Size' : SelectedFile.size });
+        
     }
     else
     {
