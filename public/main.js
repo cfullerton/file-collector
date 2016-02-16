@@ -16,11 +16,7 @@ function FileChosen(evnt) {
     SelectedFile = evnt.target.files[0];
     document.getElementById('NameBox').value = SelectedFile.name;
 }
-<<<<<<< HEAD
 var socket = io.connect('http://default-environment.9b98yidmia.us-west-2.elasticbeanstalk.com'); //   http://localhost:3000
-=======
-var socket = io.connect('http://default-environment.9b98yidmia.us-west-2.elasticbeanstalk.com/'); //http://localhost:3000 
->>>>>>> 5cd6d3098ca38e9d51f3ce7f02d66fb5b7a8bf83
 var FReader;
 var Name;
 function StartUpload(){
