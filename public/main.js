@@ -66,9 +66,29 @@ socket.on('MoreData', function (data){
 socket.on('Done', function (data){
     var Content = "List Successfully Uploaded. Downloading files from URLs";   
     document.getElementById('UploadArea').innerHTML = Content;
+	document.getElementById("list-area").disabled = true;
 });
+function reload(){
+	location.reload();
+}
 socket.on('fileDone',function(){
-    document.getElementById('file-link').innerHTML = '<a class="btn btn-success" href="/getFile" target="black">Download Zip</a>';
+    document.getElementById('file-link').innerHTML = '<div id ="success-container"><a class="btn btn-success" href="/getFile" target="black">Download Zip</a>'+
+	' <span id="minutes-left"></span>:<span id="seconds-left"></span> Left to download. We give you half an hour to download the file and then delete it to'+
+	' save space on our server. this keeps out cost down and the service free to you.</div><div class="btn btn-warn" id="reload">Upload Another</div> Save this file first!';
+	 document.getElementById('reload').addEventListener('click', reload);
+	var timeLeft = 1800;
+     setInterval(function() {
+         if (timeLeft < 1) {
+             document.getElementById('file-link').removeChild(document.getElementById('success-container'));
+         } else {
+             seconds = timeLeft % 60;
+             seconds < 10 ? seconds = "0" + seconds :seconds = seconds;
+             minutes = Math.floor(timeLeft / 60);
+             document.getElementById('seconds-left').innerHTML = seconds;
+             document.getElementById('minutes-left').innerHTML = minutes;
+             timeLeft--;
+        }
+     }, 1000);	
 });
 var totalFiles=0;
 socket.on('startGet',function(passFiles){
