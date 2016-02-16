@@ -91,13 +91,14 @@ function reload(){
 socket.on('fileDone',function(){
     document.getElementById('file-link').innerHTML = '<div id ="success-container"><a class="btn btn-success" href="/getFile" target="black">Download Zip</a>'+
 	'<div> <span id="minutes-left"></span>:<span id="seconds-left"></span> Left to download. We give you half an hour to download the file and then delete it to'+
-	' save space on our server. this keeps out cost down and the service free to you.</div><button class="btn btn-warning" id="reload">Upload Another List</button> Save this file first!<div>';
+	' save space on our server.<br> This keeps our cost down and the service free to you.</div><button class="btn btn-warning" id="reload">Upload Another List</button> Save this file first!<div>';
 	 document.getElementById('reload').addEventListener('click', reload);
 	var timeLeft = 1800;
 	writeh2("Download Your Zip Now!");
      setInterval(function() {
          if (timeLeft < 1) {
-             document.getElementById('file-link').removeChild(document.getElementById('success-container'));
+             document.getElementById('file-link').innerHTML = '<div id="out-of-time">Time to download expired. If you forgot to download you list you can ' + 
+			 ' upload it again</div><button class="btn btn-warning" id="reload">Upload Another List</button>';
          } else {
              seconds = timeLeft % 60;
              seconds < 10 ? seconds = "0" + seconds :seconds = seconds;
