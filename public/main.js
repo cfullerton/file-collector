@@ -10,6 +10,7 @@ function Ready(){
     {
         document.getElementById('UploadArea').innerHTML = "Your Browser Doesn't Support The File API Please Update Your Browser";
     }
+	writeh2("Get Started...");
 }
 var SelectedFile;
 function FileChosen(evnt) {
@@ -31,6 +32,7 @@ function writeh2(message){
 		}else{
 			clearInterval(typing);
 		}
+		count++;
 	},100);
 }
 function StartUpload(){
