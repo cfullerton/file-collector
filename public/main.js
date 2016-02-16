@@ -19,6 +19,20 @@ function FileChosen(evnt) {
 var socket = io.connect('http://default-environment.9b98yidmia.us-west-2.elasticbeanstalk.com'); //   http://localhost:3000
 var FReader;
 var Name;
+function writeh2(message){
+	var target = document.getElementById("message-h2");
+	target.innerHTML = "";
+	var addString = "";
+	var count = 0;
+	var typing = setInterval(function(){
+		if (count < message.length){
+			addString += message[count];
+			target.innerHTML = addString;
+		}else{
+			clearInterval(typing);
+		}
+	},100);
+}
 function StartUpload(){
     if(document.getElementById('FileBox').value != "")
     {
@@ -28,6 +42,7 @@ function StartUpload(){
         Content += '<div id="ProgressContainer"><progress id ="uploadProgress"></progress></div><span id="percent">0%</span>';
         Content += "<span id='Uploaded'> - <span id='MB'>0</span>/" + Math.round(SelectedFile.size / 1048576) + "MB</span>";
         document.getElementById('UploadArea').innerHTML = Content;
+		writeh2("Started...");
         FReader.onload = function(evnt){
             socket.emit('Upload', { 'Name' : Name, Data : evnt.target.result });
         }
@@ -73,10 +88,11 @@ function reload(){
 }
 socket.on('fileDone',function(){
     document.getElementById('file-link').innerHTML = '<div id ="success-container"><a class="btn btn-success" href="/getFile" target="black">Download Zip</a>'+
-	' <span id="minutes-left"></span>:<span id="seconds-left"></span> Left to download. We give you half an hour to download the file and then delete it to'+
-	' save space on our server. this keeps out cost down and the service free to you.</div><div class="btn btn-warn" id="reload">Upload Another</div> Save this file first!';
+	'<div> <span id="minutes-left"></span>:<span id="seconds-left"></span> Left to download. We give you half an hour to download the file and then delete it to'+
+	' save space on our server. this keeps out cost down and the service free to you.</div><button class="btn btn-warning" id="reload">Upload Another List</button> Save this file first!<div>';
 	 document.getElementById('reload').addEventListener('click', reload);
 	var timeLeft = 1800;
+	writeh2("Download Your Zip Now!");
      setInterval(function() {
          if (timeLeft < 1) {
              document.getElementById('file-link').removeChild(document.getElementById('success-container'));
