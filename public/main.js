@@ -93,7 +93,7 @@ socket.on('fileDone',function(){
 	'<div> <span id="minutes-left"></span>:<span id="seconds-left"></span> Left to download. We give you half an hour to download the file and then delete it to'+
 	' save space on our server.<br> This keeps our cost down and the service free to you.</div><button class="btn btn-warning" id="reload">Upload Another List</button> Save this file first!<div>';
 	 document.getElementById('reload').addEventListener('click', reload);
-	  document.getElementById('downloadarea').innerHTML = "";
+	  document.getElementById('getProgress').innerHTML = "";
 	var timeLeft = 1800;
 	writeh2("Download Your Zip Now!");
      setInterval(function() {
@@ -114,7 +114,7 @@ var totalFiles=0;
 socket.on('startGet',function(passFiles){
 	    totalFiles = passFiles;
         var Content = "<span id='NameArea'></span>";
-        Content += '<div class="ProgressContainer"><progress id ="downloadProgress"></progress></div><span id="getpercent">0</span>%';
+        Content += '<div class="ProgressContainer" id="getProgress"><progress id ="downloadProgress"></progress></div><span id="getpercent">0</span>%';
         Content += "<span id='downloaded'> - <span id='files'>0</span> " + " Lines Processed </span><span id='goodFiles'>0</span>" 
         + " Files Downloaded <span id=badUrl>0</span> Bad Urls ";
 		Content += '<span id="emptyLines"></span> empty Lines';
