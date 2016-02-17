@@ -116,8 +116,8 @@ socket.on('startGet',function(passFiles){
         var Content = "<span id='NameArea'></span>";
         Content += '<div class="ProgressContainer" id="getProgress"><progress id ="downloadProgress"></progress></div><span id="getpercent">0</span>%';
         Content += "<span id='downloaded'> - <span id='files'>0</span> " + " Lines Processed </span><span id='goodFiles'>0</span>" 
-        + " Files Downloaded <span id=badUrl>0</span> Bad Urls ";
-		Content += '<span id="emptyLines"></span> empty Lines';
+        + " Files Downloaded <span id='badUrl'>0</span> Bad Urls ";
+		Content += '<span id="emptyLines">0</span> empty Lines';
 		 document.getElementById('downloadarea').innerHTML = Content;
 		 downloadProgress.value=0;
 });
