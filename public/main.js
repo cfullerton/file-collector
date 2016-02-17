@@ -22,7 +22,7 @@ var FReader;
 var Name;
 function writeh2(message){
 	var target = document.getElementById("message-h2");
-	target.innerHTML = "";
+	target.innerHTML = " ";
 	var addString = "";
 	var count = 0;
 	var typing = setInterval(function(){
@@ -93,6 +93,7 @@ socket.on('fileDone',function(){
 	'<div> <span id="minutes-left"></span>:<span id="seconds-left"></span> Left to download. We give you half an hour to download the file and then delete it to'+
 	' save space on our server.<br> This keeps our cost down and the service free to you.</div><button class="btn btn-warning" id="reload">Upload Another List</button> Save this file first!<div>';
 	 document.getElementById('reload').addEventListener('click', reload);
+	  document.getElementById('downloadarea').innerHTML = "";
 	var timeLeft = 1800;
 	writeh2("Download Your Zip Now!");
      setInterval(function() {
@@ -137,7 +138,7 @@ socket.on("badUrl",function(){
 var emptyLines = 0;
 socket.on("emptyLine",function(){
 	totalFiles--;
-	emptyLines++
+	emptyLines++;
 	document.getElementById('emptyLines').innerHTML = emptyLines;
 })
 function Refresh(){
